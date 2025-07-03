@@ -43,18 +43,44 @@ export const createProduct = async (req, res, next) => {
 };
 
 // @desc    Update product
+// @desc    Update product
 export const updateProduct = async (req, res, next) => {
   try {
+    const { name, price, category, stock, description } = req.body;
+
+    // Check if new images are uploaded
+    const newImages = req.files?.map(file => file.path) || [];
+
+    // Build updated data object
+    const updatedData = {
+      name,
+      price,
+      category,
+      stock,
+      description,
+    };
+
+    // Only update images if new images are sent
+    if (newImages.length > 0) {
+      updatedData.images = newImages;
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      updatedData,
       { new: true }
     );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
     res.status(200).json(updatedProduct);
   } catch (err) {
     next(err);
   }
 };
+
 
 // @desc    Delete product
 export const deleteProduct = async (req, res, next) => {
