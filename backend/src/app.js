@@ -8,6 +8,7 @@ import express from 'express';
 import cors from 'cors';
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
 
 import { errorHandler } from './middleware/errorMiddleware.js';
 
@@ -31,9 +32,10 @@ app.use(morgan('dev'));
 
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/orders', orderRoutes);
 
 
 // Global Error Handler
-app.use(errorHandler);
+app.use(errorHandler);/
 
 export default app;
