@@ -1,4 +1,4 @@
-import Product from '../models/Product.js';
+import Product from '../models/Product.model.js';
 
 // @desc    Get all products
 export const getAllProducts = async (req, res, next) => {
@@ -60,7 +60,7 @@ export const updateProduct = async (req, res, next) => {
       description,
     };
 
-    // Only update images if new images are sent
+
     if (newImages.length > 0) {
       updatedData.images = newImages;
     }
@@ -76,7 +76,7 @@ export const updateProduct = async (req, res, next) => {
     }
 
     res.status(200).json(updatedProduct);
-  } catch (err) {
+  } catch (err) {  
     next(err);
   }
 };
