@@ -36,6 +36,6 @@ app.use('/api/orders', orderRoutes);
 
 
 // Global Error Handler
-app.use(errorHandler);/
+app.use(errorHandler);
 
 export default app;
