@@ -1,11 +1,3 @@
-# backend-ecommerce
-
-
-
-
-  `backend/README.md`
-
-markdown
 # 🛒 E-commerce Backend API
 
 This is a RESTful API built using Node.js, Express.js, and MongoDB for an E-commerce platform. It supports full product management, user authentication, orders, and reviews.
