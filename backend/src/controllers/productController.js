@@ -91,3 +91,56 @@ export const deleteProduct = async (req, res, next) => {
     next(err);
   }
 };
+
+
+
+// @desc    Add a review to a product
+export const addProductReview = async (req, res, next) => {
+  try {
+    const { comment, rating } = req.body;
+    const product = await Product.findById(req.params.id);
+
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    // Prevent duplicate review from same user
+    const alreadyReviewed = product.reviews.find(
+      (rev) => rev.user.toString() === req.user._id.toString()
+    );
+
+    if (alreadyReviewed) {
+      return res.status(400).json({ message: 'Product already reviewed by this user' });
+    }
+
+    const review = {
+      user: req.user._id,
+      comment,
+      rating: Number(rating),
+    };
+
+    product.reviews.push(review);
+
+    // Optional: update average rating
+    product.rating =
+      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      product.reviews.length;
+
+    await product.save();
+
+    res.status(201).json({ message: 'Review added' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Get all reviews of a product
+export const getProductReviews = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id).populate('reviews.user', 'name');
+
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    res.status(200).json(product.reviews);
+  } catch (err) {
+    next(err);
+  }
+};
