@@ -13,12 +13,12 @@ import orderRoutes from './routes/orderRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
 const app = express();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Configure CORS with specific options
 const corsOptions = {
