@@ -1,14 +1,43 @@
 import Product from '../models/Product.model.js';
 
 // @desc    Get all products
-export const getAllProducts = async (req, res, next) => {
+// export const getAllProducts = async (req, res, next) => {
+//   try {
+//     const products = await Product.find();
+//     res.status(200).json(products);
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
+// In productController.js
+export const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find();
-    res.status(200).json(products);
-  } catch (err) {
-    next(err);
+    const { search = "", category, minPrice, maxPrice, page = 1, limit = 10 } = req.query;
+    
+    const filter = {
+      name: { $regex: search, $options: "i" },
+    };
+    if (category) filter.category = category;
+    if (minPrice && maxPrice) filter.price = { $gte: minPrice, $lte: maxPrice };
+
+    const products = await Product.find(filter)
+      .limit(limit * 1)
+      .skip((page - 1) * limit)
+      .exec();
+
+    const count = await Product.countDocuments(filter);
+
+    res.json({
+      products,
+      totalPages: Math.ceil(count / limit),
+      currentPage: Number(page),
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
   }
 };
+
 
 // @desc    Get single product
 export const getProductById = async (req, res, next) => {
@@ -144,4 +173,10 @@ export const getProductReviews = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+
+export const getCategories = async (req, res) => {
+  const categories = await Product.distinct("category");
+  res.json(categories);
 };

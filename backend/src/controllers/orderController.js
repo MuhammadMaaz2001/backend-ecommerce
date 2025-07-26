@@ -1,4 +1,5 @@
 import Order from '../models/Order.model.js';
+import { sendEmail } from "../utils/sendEmail.js";
 
 // @desc Create a new order
 export const createOrder = async (req, res, next) => {
@@ -9,7 +10,6 @@ export const createOrder = async (req, res, next) => {
       return res.status(400).json({ message: 'No order items provided' });
     }
 
-    // parse stringified array if needed
     const parsedItems = typeof orderItems === 'string' ? JSON.parse(orderItems) : orderItems;
 
     const order = await Order.create({
@@ -17,6 +17,14 @@ export const createOrder = async (req, res, next) => {
       orderItems: parsedItems,
       totalPrice,
     });
+
+    const user = await User.findById(req.user._id);
+
+    await sendEmail(
+      user.email,
+      "Order Placed Successfully",
+      `Thank you for your order!\n\nOrder ID: ${order._id}\nTotal: $${order.totalPrice}\n\nWe'll notify you as your order progresses.`
+    );
 
     res.status(201).json(order);
   } catch (err) {
@@ -51,5 +59,29 @@ export const getOrderById = async (req, res, next) => {
     res.status(200).json(order);
   } catch (err) {
     next(err);
+  }
+};
+
+// Admin: Update order status
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const { id } = req.params;
+
+    const order = await Order.findById(id).populate("user", "email");
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    order.status = status;
+    await order.save();
+
+    await sendEmail(
+      order.user.email,
+      `Order Status Updated`,
+      `Your order with ID ${order._id} is now marked as "${order.status}".\n\nThank you for shopping with us!`
+    );
+
+    res.status(200).json({ message: "Order status updated", order });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };

@@ -61,3 +61,24 @@ export const getUserProfile = async (req, res, next) => {
     next(err);
   }
 };
+
+export const toggleWishlist = async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const productId = req.params.productId;
+
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  const index = user.wishlist.indexOf(productId);
+  if (index > -1) {
+    user.wishlist.splice(index, 1); // remove
+  } else {
+    user.wishlist.push(productId); // add
+  }
+  await user.save();
+  res.json(user.wishlist);
+};
+
+export const getWishlist = async (req, res) => {
+  const user = await User.findById(req.user._id).populate("wishlist");
+  res.json(user.wishlist);
+};

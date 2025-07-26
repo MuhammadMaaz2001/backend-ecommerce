@@ -13,7 +13,20 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-  }
+  },
+  wishlist: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product",
+  },
+],
+role: {
+  type: String,
+  enum: ["user", "admin"],
+  default: "user"
+},
+
+
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);

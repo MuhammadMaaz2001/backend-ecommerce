@@ -20,6 +20,11 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  category: {
+  type: String,
+  required: true,
+},
+
   reviews: [
     {
       user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
